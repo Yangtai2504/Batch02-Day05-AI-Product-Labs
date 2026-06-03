@@ -1,5 +1,4 @@
-# Workshop — Mổ App AI Thật
-> Member 4 — Nguyễn Tiến Dương  
+> Member 4 — Nguyễn Tiến Dương - MSSV: 2A202600823 
 > App: Ada Health | Track: Healthcare
 
 ---
