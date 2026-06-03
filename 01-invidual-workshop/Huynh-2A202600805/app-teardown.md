@@ -26,7 +26,6 @@ Người có triệu chứng như sốt, đau họng, muốn biết: có nên ng
 - User bị buộc phải tự đánh giá tiếp hành động nên làm gì.
 
 ## 5. Evidence
-- Screenshot: phản hồi của Ada Health khi nhập triệu chứng.
 - Prompt: "Tôi bị sốt và đau họng".
 - Hành vi quan sát: app vẫn đoán đúng, nhưng thiếu triage rõ ràng.
 
