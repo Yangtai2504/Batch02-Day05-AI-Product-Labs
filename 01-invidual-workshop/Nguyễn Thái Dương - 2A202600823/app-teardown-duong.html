@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ada Health — Workshop Review · Nguyễn Thái Dương</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F6F4EF;
+    --surface: #FFFDF9;
+    --ink: #1A1814;
+    --ink-muted: #6B6760;
+    --ink-faint: #B0AEA9;
+    --accent: #1A6B8A;
+    --accent-soft: #E3F2F8;
+    --success: #1A6B3E;
+    --success-soft: #E3F0E9;
+    --warn: #8B6A00;
+    --warn-soft: #FDF6DC;
+    --fail: #9B1C1C;
+    --fail-soft: #FCE8E8;
+    --border: rgba(26,24,20,0.12);
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans: 'Instrument Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+    --r: 8px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  .page { max-width: 860px; margin: 0 auto; padding: 0 24px 80px; }
+
+  .hero {
+    padding: 60px 0 48px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 56px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 24px;
+  }
+  .hero-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(32px, 5vw, 52px);
+    line-height: 1.15;
+    letter-spacing: -.02em;
+    color: var(--ink);
+  }
+  .hero h1 em { color: var(--accent); font-style: italic; }
+  .hero-meta { font-size: 13px; color: var(--ink-muted); margin-top: 12px; }
+  .score-badge {
+    background: var(--ink);
+    color: #F6F4EF;
+    border-radius: 100px;
+    padding: 8px 20px;
+    font-size: 13px;
+    font-family: var(--mono);
+    white-space: nowrap;
+  }
+  .score-badge span { font-size: 22px; font-weight: 500; display: block; text-align: center; }
+
+  .section { margin-bottom: 56px; }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 8px;
+  }
+  .section-title {
+    font-family: var(--serif);
+    font-size: 28px;
+    line-height: 1.2;
+    margin-bottom: 28px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 20px;
+  }
+  .stat-card .num {
+    font-family: var(--serif);
+    font-size: 42px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-card .label { font-size: 13px; color: var(--ink-muted); }
+  .stat-card.green .num { color: var(--success); }
+  .stat-card.amber .num { color: var(--warn); }
+  .stat-card.red .num { color: var(--fail); }
+
+  .query-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .query-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .query-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    background: var(--bg);
+    border-radius: 4px;
+    padding: 2px 8px;
+  }
+  .query-topic { font-size: 14px; font-weight: 600; flex: 1; }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 100px;
+    padding: 3px 12px;
+  }
+  .badge.pass { background: var(--success-soft); color: var(--success); }
+  .badge.warn { background: var(--warn-soft); color: var(--warn); }
+  .badge.fail { background: var(--fail-soft); color: var(--fail); }
+  .badge::before { font-size: 10px; }
+  .badge.pass::before { content: '✓'; }
+  .badge.warn::before { content: '~'; }
+  .badge.fail::before { content: '✗'; }
+
+  .query-body { padding: 20px; }
+
+  .chat-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .chat-row.user { justify-content: flex-end; }
+  .chat-bubble {
+    max-width: 78%;
+    border-radius: var(--r);
+    padding: 10px 14px;
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .chat-row.user .chat-bubble {
+    background: var(--ink);
+    color: #F6F4EF;
+    border-bottom-right-radius: 3px;
+  }
+  .chat-row.bot .chat-bubble {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 3px;
+  }
+  .chat-label {
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--ink-faint);
+    align-self: flex-end;
+    padding-bottom: 2px;
+  }
+
+  .points-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .point-block { background: var(--bg); border-radius: var(--r); padding: 12px 14px; }
+  .point-block h4 { font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .06em; }
+  .point-block ul { list-style: none; padding: 0; }
+  .point-block ul li { font-size: 13px; line-height: 1.5; padding: 2px 0; }
+  .point-block ul li::before { content: '— '; color: var(--ink-faint); }
+
+  .note-box {
+    border-left: 3px solid var(--fail);
+    background: var(--fail-soft);
+    border-radius: 0 var(--r) var(--r) 0;
+    padding: 12px 16px;
+    font-size: 13px;
+    margin-top: 14px;
+    color: #5C1010;
+  }
+  .note-box.warn {
+    border-left-color: var(--warn);
+    background: var(--warn-soft);
+    color: #4A3800;
+  }
+  .note-box.info {
+    border-left-color: var(--accent);
+    background: var(--accent-soft);
+    color: #0D3D50;
+  }
+
+  .flow { display: flex; flex-direction: column; gap: 0; }
+  .flow-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    position: relative;
+  }
+  .flow-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 16px;
+    top: 44px;
+    width: 2px;
+    height: calc(100% - 16px);
+    background: var(--border);
+  }
+  .flow-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-family: var(--mono);
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  .flow-dot.ok { background: var(--success-soft); color: var(--success); border: 1.5px solid #1A6B3E40; }
+  .flow-dot.fail { background: var(--fail-soft); color: var(--fail); border: 1.5px solid #9B1C1C40; }
+  .flow-dot.neutral { background: var(--bg); color: var(--ink-muted); border: 1.5px solid var(--border); }
+  .flow-dot.warn { background: var(--warn-soft); color: var(--warn); border: 1.5px solid #8B6A0040; }
+  .flow-text { font-size: 14px; }
+  .flow-text strong { font-weight: 600; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+  .pattern-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .pattern-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 18px;
+  }
+  .pattern-icon { font-size: 22px; margin-bottom: 8px; }
+  .pattern-card h3 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .pattern-card p { font-size: 13px; color: var(--ink-muted); line-height: 1.5; }
+  .pattern-card.strong { border-top: 3px solid var(--success); }
+  .pattern-card.weak { border-top: 3px solid var(--fail); }
+  .pattern-card.mid { border-top: 3px solid var(--warn); }
+
+  .finding-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+  .finding-card .finding-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+  }
+  .finding-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+  .finding-row { display: flex; gap: 8px; margin-bottom: 6px; font-size: 13px; }
+  .finding-row .label { font-family: var(--mono); font-size: 11px; color: var(--ink-muted); min-width: 64px; padding-top: 2px; }
+  .finding-row .val { color: var(--ink); line-height: 1.55; }
+  .layer-tag {
+    display: inline-block;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 2px 8px;
+    margin-top: 8px;
+  }
+
+  .decision-box {
+    background: var(--ink);
+    color: #F6F4EF;
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 56px;
+  }
+  .decision-box .pre { font-family: var(--mono); font-size: 11px; color: #B0AEA9; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 12px; }
+  .decision-box blockquote {
+    font-family: var(--serif);
+    font-size: clamp(18px, 2.5vw, 24px);
+    line-height: 1.4;
+    margin-bottom: 20px;
+    border: none;
+    padding: 0;
+  }
+  .decision-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .decision-tag {
+    background: rgba(255,255,255,.1);
+    color: #F6F4EF;
+    border-radius: 100px;
+    padding: 4px 14px;
+    font-size: 12px;
+    font-family: var(--mono);
+  }
+
+  .conclusion {
+    border-top: 1px solid var(--border);
+    padding-top: 40px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+  .conclusion h2 { font-family: var(--serif); font-size: 22px; margin-bottom: 12px; }
+  .conclusion p { font-size: 14px; color: var(--ink-muted); line-height: 1.7; }
+
+  @media (max-width: 620px) {
+    .hero { grid-template-columns: 1fr; }
+    .summary-grid { grid-template-columns: repeat(3, 1fr); }
+    .points-grid { grid-template-columns: 1fr; }
+    .pattern-grid { grid-template-columns: 1fr; }
+    .two-col { grid-template-columns: 1fr; }
+    .conclusion { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div>
+      <p class="hero-tag">Workshop Review · Ada Health · Track E — Healthcare</p>
+      <h1>Ada Health —<br><em>Symptom Checker</em></h1>
+      <p class="hero-meta">Nguyễn Thái Dương · 2A202600823 · Member 4 — Product Slice</p>
+      <p class="hero-meta" style="margin-top:4px">10 test cases · 4 paths · 4 findings</p>
+    </div>
+    <div class="score-badge">
+      <span>1 / 4</span>
+      Paths đủ
+    </div>
+  </header>
+
+  <!-- SUMMARY STATS -->
+  <section class="section">
+    <p class="section-label">Kết quả tổng quan</p>
+    <div class="summary-grid">
+      <div class="stat-card green">
+        <div class="num">1</div>
+        <div class="label">Happy Path ✓</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="num">1</div>
+        <div class="label">Low-confidence ~</div>
+      </div>
+      <div class="stat-card red">
+        <div class="num">2</div>
+        <div class="label">Failure / Missing ✗</div>
+      </div>
+    </div>
+    <div class="note-box info">
+      <strong>Promise của Ada Health:</strong> "Hiểu tình trạng sức khỏe của bạn thông qua đánh giá triệu chứng thông minh — giúp bạn quyết định có nên đi khám không."
+    </div>
+  </section>
+
+  <!-- TEST SESSIONS -->
+  <section class="section">
+    <p class="section-label">Chi tiết test sessions</p>
+    <h2 class="section-title">4 paths quan trọng nhất</h2>
+
+    <!-- Q1 Happy -->
+    <div class="query-card">
+      <div class="query-header">
+        <span class="query-num">HAPPY</span>
+        <span class="query-topic">Triệu chứng rõ — Sốt + đau họng 2 ngày</span>
+        <span class="badge pass">Happy Path</span>
+      </div>
+      <div class="query-body">
+        <div class="chat-row user"><span class="chat-label">User</span><div class="chat-bubble">Tôi bị sốt và đau họng 2 ngày nay</div></div>
+        <div class="chat-row bot"><div class="chat-bubble">Ada hỏi thêm 6–8 câu: nhiệt độ cơ thể, có ho không, tiếp xúc ai không, có khó thở không, thuốc đang dùng...</div><span class="chat-label">Ada</span></div>
+        <div class="chat-row bot"><div class="chat-bubble">Kết quả: <strong>Influenza (Flu)</strong> — Mức độ: <em>See a doctor within 24h</em>. Khả năng liên quan: COVID-19, Viêm họng liên cầu.</div><span class="chat-label">Ada</span></div>
+        <div class="points-grid">
+          <div class="point-block">
+            <h4>✓ Điểm tốt</h4>
+            <ul>
+              <li>Kết quả hợp lý với triệu chứng</li>
+              <li>Có thang triage 8 mức, rõ ràng</li>
+              <li>Luôn kèm disclaimer "không phải chẩn đoán"</li>
+              <li>Source click được</li>
+            </ul>
+          </div>
+          <div class="point-block">
+            <h4>→ Kết luận</h4>
+            <ul>
+              <li>Happy path hoạt động tốt khi triệu chứng rõ ràng và user đủ kiên nhẫn trả lời đủ câu hỏi</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q2 Low confidence -->
+    <div class="query-card">
+      <div class="query-header">
+        <span class="query-num">LOW-CONF</span>
+        <span class="query-topic">Triệu chứng mơ hồ — Mệt mỏi, hơi chóng mặt</span>
+        <span class="badge warn">Low-confidence</span>
+      </div>
+      <div class="query-body">
+        <div class="chat-row user"><span class="chat-label">User</span><div class="chat-bubble">Tôi mệt mỏi và hơi chóng mặt</div></div>
+        <div class="chat-row bot"><div class="chat-bubble">Ada vẫn hỏi đủ chuỗi câu hỏi như case rõ ràng → ra kết quả danh sách dài: Thiếu máu, Hạ đường huyết, Mất nước, Mệt mỏi thông thường... với tone trình bày như nhau.</div><span class="chat-label">Ada</span></div>
+        <div class="points-grid">
+          <div class="point-block">
+            <h4>✗ Điểm gãy</h4>
+            <ul>
+              <li>Không có tín hiệu "AI đang không chắc"</li>
+              <li>Tone tự tin như case có triệu chứng rõ</li>
+              <li>Danh sách 5–7 bệnh cùng lúc gây bối rối</li>
+              <li>User không biết kết quả đáng tin ở mức nào</li>
+            </ul>
+          </div>
+          <div class="point-block">
+            <h4>→ Cần sửa</h4>
+            <ul>
+              <li>Signal uncertainty rõ ràng khi confidence thấp</li>
+              <li>Hỏi lại hoặc thu hẹp thay vì liệt kê dài</li>
+            </ul>
+          </div>
+        </div>
+        <div class="note-box warn">
+          <strong>Confidence gap:</strong> Ada không phân biệt tone giữa "chắc chắn" và "không chắc" — user không có căn cứ để biết khi nào nên tin, khi nào nên nghi ngờ.
+        </div>
+      </div>
+    </div>
+
+    <!-- Q3 Red flag failure -->
+    <div class="query-card">
+      <div class="query-header">
+        <span class="query-num">FAILURE</span>
+        <span class="query-topic">Red flag — Đau ngực + khó thở</span>
+        <span class="badge fail">Failure</span>
+      </div>
+      <div class="query-body">
+        <div class="chat-row user"><span class="chat-label">User</span><div class="chat-bubble">Tôi bị đau ngực lan ra tay trái và khó thở</div></div>
+        <div class="chat-row bot"><div class="chat-bubble">Ada tiếp tục hỏi chuỗi câu hỏi thông thường: bao lâu rồi, mức độ đau 1–10, có buồn nôn không... trước khi đưa ra kết quả triage Emergency.</div><span class="chat-label">Ada</span></div>
+        <div class="points-grid">
+          <div class="point-block">
+            <h4>✗ Điểm gãy nguy hiểm</h4>
+            <ul>
+              <li>Red flag keyword không được detect ngay</li>
+              <li>Vẫn đi qua toàn bộ questionnaire flow</li>
+              <li>Mỗi câu hỏi thêm = thêm thời gian trễ</li>
+              <li>Bài học Babylon Health: bỏ sót đau tim → phá sản</li>
+            </ul>
+          </div>
+          <div class="point-block">
+            <h4>→ Cần sửa ngay</h4>
+            <ul>
+              <li>Detect red flag ở bước đầu tiên</li>
+              <li>Bypass toàn bộ flow</li>
+              <li>Hiển thị "Gọi 115 ngay" trước mọi thứ khác</li>
+            </ul>
+          </div>
+        </div>
+        <div class="note-box">
+          ⚠️ <strong>Safety-critical failure.</strong> Với ca đau tim thật, mỗi phút đều quan trọng. Một chatbot tiếp tục hỏi "buồn nôn không?" trong tình huống này là nguy hiểm thật sự — không chỉ là UX xấu.
+        </div>
+      </div>
+    </div>
+
+    <!-- Q4 Correction missing -->
+    <div class="query-card">
+      <div class="query-header">
+        <span class="query-num">CORRECTION</span>
+        <span class="query-topic">User muốn sửa kết quả sai</span>
+        <span class="badge fail">Không có path</span>
+      </div>
+      <div class="query-body">
+        <div class="chat-row user"><span class="chat-label">User</span><div class="chat-bubble">Kết quả này sai — tôi không bị Flu, tôi chỉ bị viêm mũi dị ứng thôi</div></div>
+        <div class="chat-row bot"><div class="chat-bubble">Ada không có cơ chế response cho correction. User chỉ có thể bắt đầu lại từ đầu hoặc thoát app.</div><span class="chat-label">Ada</span></div>
+        <div class="points-grid">
+          <div class="point-block">
+            <h4>✗ Hoàn toàn thiếu</h4>
+            <ul>
+              <li>Không có nút "Report sai"</li>
+              <li>Không có undo từng triệu chứng</li>
+              <li>Không có correction log</li>
+              <li>Data feedback = zero</li>
+            </ul>
+          </div>
+          <div class="point-block">
+            <h4>→ Tác động</h4>
+            <ul>
+              <li>User thoát app thay vì thử lại</li>
+              <li>Hệ thống không có signal để cải thiện</li>
+              <li>Không biết bao nhiêu % kết quả bị sai</li>
+            </ul>
+          </div>
+        </div>
+        <div class="note-box warn">
+          <strong>Learning signal = 0.</strong> Không có correction path → không có feedback loop → product không thể tự cải thiện. Đây cũng là nguy cơ nếu sau này thêm correction: phải có moderation layer để tránh user cố ý poison data.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PATTERNS -->
+  <section class="section">
+    <p class="section-label">Pattern quan sát được</p>
+    <h2 class="section-title">Điểm mạnh & điểm yếu</h2>
+    <div class="pattern-grid">
+      <div class="pattern-card strong">
+        <div class="pattern-icon">🎯</div>
+        <h3>Triage — Tốt</h3>
+        <p>8 mức triage từ Self-care đến Emergency. Kết quả hợp lý khi triệu chứng rõ ràng. Luôn kèm disclaimer y khoa.</p>
+      </div>
+      <div class="pattern-card mid">
+        <div class="pattern-icon">🤖</div>
+        <h3>Adaptive Q&A — Trung bình</h3>
+        <p>Hỏi thích ứng (Bayesian), ít câu hơn app khác. Nhưng vẫn cứng nhắc — user phải trả lời hết, không thể mô tả tự nhiên.</p>
+      </div>
+      <div class="pattern-card weak">
+        <div class="pattern-icon">🚨</div>
+        <h3>Red flag & Recovery — Yếu</h3>
+        <p>Không detect red flag sớm. Không có correction path. Không signal uncertainty. Ba lỗi này đều nguy hiểm trong medical context.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINDINGS -->
+  <section class="section">
+    <p class="section-label">Findings thành product decision</p>
+    <h2 class="section-title">4 quyết định cần thay đổi</h2>
+
+    <div class="finding-card">
+      <div class="finding-num">Finding 01</div>
+      <h3>Questionnaire fatigue — Gánh nặng đặt nhầm chỗ</h3>
+      <div class="finding-row"><div class="label">Trigger</div><div class="val">User phải trả lời 8–12 câu hỏi trắc nghiệm liên tiếp để mô tả triệu chứng</div></div>
+      <div class="finding-row"><div class="label">Failure</div><div class="val">User mất kiên nhẫn, bỏ giữa chừng → data đầu vào không đủ để triage chính xác</div></div>
+      <div class="finding-row"><div class="label">Hậu quả</div><div class="val">Tỉ lệ drop-off cao, kết quả kém chính xác hơn vì thiếu context</div></div>
+      <div class="finding-row"><div class="label">Sửa bằng</div><div class="val">Conversation-first: user mô tả tự nhiên, AI trích xuất triệu chứng, chỉ hỏi thêm những gì thật sự còn thiếu (tối đa 3 lượt)</div></div>
+      <span class="layer-tag">UX · Intent</span>
+    </div>
+
+    <div class="finding-card">
+      <div class="finding-num">Finding 02</div>
+      <h3>Kết quả không có giải thích — Mất trust</h3>
+      <div class="finding-row"><div class="label">Trigger</div><div class="val">AI trả ra danh sách nhiều khả năng bệnh với mức tin cậy khác nhau</div></div>
+      <div class="finding-row"><div class="label">Failure</div><div class="val">Không giải thích triệu chứng nào dẫn đến từng kết quả</div></div>
+      <div class="finding-row"><div class="label">Hậu quả</div><div class="val">User bối rối, không biết tin cái nào, mất trust vào hệ thống</div></div>
+      <div class="finding-row"><div class="label">Sửa bằng</div><div class="val">Kèm theo mỗi kết quả: "Dựa trên: [triệu chứng X, Y, Z]" — giải thích ngắn, rõ ràng</div></div>
+      <span class="layer-tag">Trust · UX Recovery</span>
+    </div>
+
+    <div class="finding-card">
+      <div class="finding-num">Finding 03</div>
+      <h3>Red flag không được ưu tiên — Safety-critical</h3>
+      <div class="finding-row"><div class="label">Trigger</div><div class="val">User nhập triệu chứng đau ngực + khó thở (dấu hiệu đau tim tiềm tàng)</div></div>
+      <div class="finding-row"><div class="label">Failure</div><div class="val">AI vẫn đi qua toàn bộ questionnaire flow trước khi escalate</div></div>
+      <div class="finding-row"><div class="label">Hậu quả</div><div class="val">Chậm trễ nguy hiểm — trong ca cấp cứu thật, thời gian phản ứng là sống còn</div></div>
+      <div class="finding-row"><div class="label">Sửa bằng</div><div class="val">Red flag keyword detection ở bước đầu tiên → bypass flow → hiển thị ngay "Gọi 115" trước mọi thứ</div></div>
+      <span class="layer-tag">Safety · Promise</span>
+    </div>
+
+    <div class="finding-card">
+      <div class="finding-num">Finding 04</div>
+      <h3>Không có correction path — Learning signal = 0</h3>
+      <div class="finding-row"><div class="label">Trigger</div><div class="val">User nhận kết quả sai và muốn sửa hoặc phản hồi</div></div>
+      <div class="finding-row"><div class="label">Failure</div><div class="val">Không có "Report sai", không có undo — chỉ có thể bắt đầu lại</div></div>
+      <div class="finding-row"><div class="label">Hậu quả</div><div class="val">User thoát app; hệ thống mất feedback signal hoàn toàn; không biết % kết quả sai</div></div>
+      <div class="finding-row"><div class="label">Sửa bằng</div><div class="val">Correction log với moderation layer: user report → queue → human review → update rule (không auto-learn để tránh data poisoning)</div></div>
+      <span class="layer-tag">UX Recovery · Learning Signal</span>
+    </div>
+  </section>
+
+  <!-- AS-IS FLOW -->
+  <section class="section">
+    <p class="section-label">Path yếu nhất</p>
+    <h2 class="section-title">AS-IS — Toàn bộ flow hiện tại</h2>
+    <div class="flow">
+      <div class="flow-step"><div class="flow-dot ok">1</div><div class="flow-text">User mở app, nhập triệu chứng ban đầu (free text)</div></div>
+      <div class="flow-step"><div class="flow-dot warn">!</div><div class="flow-text"><strong>App không detect red flag</strong> — mọi input đều đi vào flow questionnaire cứng</div></div>
+      <div class="flow-step"><div class="flow-dot neutral">2</div><div class="flow-text">App chuyển sang 8–12 câu hỏi trắc nghiệm liên tiếp</div></div>
+      <div class="flow-step"><div class="flow-dot warn">!</div><div class="flow-text"><strong>Drop-off cao</strong> — user mất kiên nhẫn, bỏ giữa chừng</div></div>
+      <div class="flow-step"><div class="flow-dot ok">3</div><div class="flow-text">User trả lời đủ → Ada đưa ra kết quả triage</div></div>
+      <div class="flow-step"><div class="flow-dot fail">✗</div><div class="flow-text"><strong>Kết quả không có giải thích</strong> — danh sách bệnh, không rõ tại sao</div></div>
+      <div class="flow-step"><div class="flow-dot fail">✗</div><div class="flow-text"><strong>Kết quả sai → user không có chỗ sửa</strong> — chỉ có thể restart hoặc thoát</div></div>
+    </div>
+  </section>
+
+  <!-- TO-BE FLOW -->
+  <section class="section">
+    <p class="section-label">Đề xuất cải thiện</p>
+    <h2 class="section-title">TO-BE — Flow đã sửa</h2>
+    <div class="flow">
+      <div class="flow-step"><div class="flow-dot ok">1</div><div class="flow-text">User mô tả triệu chứng tự nhiên</div></div>
+      <div class="flow-step"><div class="flow-dot ok">🛡</div><div class="flow-text"><strong>[Cải tiến 1] Red flag detection ngay lập tức</strong> — nếu phát hiện, bypass toàn bộ flow → hiển thị "Gọi 115 ngay"</div></div>
+      <div class="flow-step"><div class="flow-dot ok">2</div><div class="flow-text"><strong>[Cải tiến 2] Conversation-first</strong> — AI trích xuất triệu chứng từ mô tả, hỏi thêm tối đa 3 lượt những gì còn thiếu</div></div>
+      <div class="flow-step"><div class="flow-dot ok">3</div><div class="flow-text">AI phân loại triage: <strong>Self-care / See Doctor / Emergency</strong></div></div>
+      <div class="flow-step"><div class="flow-dot ok">4</div><div class="flow-text"><strong>[Cải tiến 3] Kết quả kèm giải thích</strong> — "Dựa trên: sốt 38.5°C, đau họng 2 ngày, tiếp xúc người bệnh"</div></div>
+      <div class="flow-step"><div class="flow-dot ok">5</div><div class="flow-text"><strong>[Cải tiến 4] Uncertainty signal</strong> — nếu AI không chắc, hiển thị rõ + gợi ý "Mô tả thêm" hoặc "Hỏi bác sĩ"</div></div>
+      <div class="flow-step"><div class="flow-dot ok">6</div><div class="flow-text"><strong>[Cải tiến 5] Correction path</strong> — "Report sai" → queue → human review → update rule (không auto-learn)</div></div>
+    </div>
+  </section>
+
+  <!-- PRODUCT DECISION -->
+  <div class="decision-box">
+    <p class="pre">Product Decision — Member 4</p>
+    <blockquote>"Ada có knowledge triage tốt nhưng gánh nặng đặt nhầm chỗ — user phải làm việc thay AI. Prototype cần: (1) detect red flag sớm, (2) conversation-first intake, (3) giải thích kết quả, (4) correction path có moderation."</blockquote>
+    <p style="font-size:13px;color:#B0AEA9;margin-bottom:16px;">Build slice: <em>Conversational Symptom Triage Assistant — 1 user, 1 session, 3 triage level + red flag bypass.</em></p>
+    <div class="decision-tags">
+      <span class="decision-tag">Red flag bypass</span>
+      <span class="decision-tag">Conversation-first</span>
+      <span class="decision-tag">Explain output</span>
+      <span class="decision-tag">Uncertainty signal</span>
+      <span class="decision-tag">Correction + moderation</span>
+    </div>
+  </div>
+
+  <!-- CONCLUSION -->
+  <footer class="conclusion">
+    <div>
+      <h2>Ada hôm nay</h2>
+      <p>Symptom checker questionnaire khá tốt, triage 8 mức rõ ràng, disclaimer y khoa đầy đủ. Điểm yếu: questionnaire cứng nhắc gây drop-off, không explain output, không detect red flag sớm, không có correction path.</p>
+    </div>
+    <div>
+      <h2>Prototype cần gì</h2>
+      <p>Một session ngắn: user mô tả tự nhiên → AI hỏi tối đa 3 lượt → phân loại 3 mức + giải thích. Bắt buộc có 2 failure path để demo: triệu chứng mơ hồ (hỏi lại) và red flag (escalate ngay).</p>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
