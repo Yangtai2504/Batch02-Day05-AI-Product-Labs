@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Huyền - App Teardown</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; margin: 24px; max-width: 900px; color: #222; }
+    h1, h2, h3 { color: #1f4e79; }
+    h1 { margin-bottom: 0.3em; }
+    h2 { margin-top: 1.8em; }
+    h3 { margin-top: 1.2em; }
+    table { border-collapse: collapse; width: 100%; margin: 16px 0; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+    th { background: #f4f7fb; }
+    ul { margin: 0.5em 0 1em 1.3em; }
+    .note { background: #eef6ff; padding: 12px; border-left: 4px solid #1f4e79; margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <h1>Workshop — Mổ App AI Thật</h1>
+  <p><strong>Người thực hiện:</strong> Huyền</p>
+  <p><strong>MSV:</strong> 2A202600650</p>
+  <p><strong>App thử:</strong> Ada Health</p>
+  <p><strong>Thời gian:</strong> 40 phút</p>
+  <p><strong>Hình thức:</strong> cá nhân trước, chia sẻ theo nhóm sau</p>
+  <p><strong>Output:</strong> finding note + sketch <code>as-is / to-be</code></p>
+
+  <h2>1. Product hứa gì?</h2>
+  <p>Ada Health hứa giúp user nhanh chóng hiểu triệu chứng, đánh giá mức độ nghiêm trọng và đề xuất hành động y tế phù hợp.</p>
+
+  <h2>2. User nào được hứa giúp?</h2>
+  <p>Người đang có triệu chứng ban đầu (sốt, ho, đau họng, mệt mỏi), cần biết có nên tự chăm sóc, test COVID, hay đi khám.</p>
+
+  <h2>3. Kỳ vọng AI làm được task nào?</h2>
+  <ul>
+    <li>Nhận diện triệu chứng chính ngay khi user nhập.</li>
+    <li>Hỏi lại đúng các yếu tố quan trọng (thời gian, độ nặng, dấu hiệu kèm theo).</li>
+    <li>Trả kết quả ngắn gọn, rõ ràng và gợi ý hành động tiếp theo.</li>
+    <li>Giảm thiểu sự mơ hồ khi có nhiều khả năng chẩn đoán.</li>
+  </ul>
+
+  <h2>4. Dùng thật, điểm gãy xuất hiện ở đâu?</h2>
+  <h3>4.1 Kịch bản dùng</h3>
+  <ul>
+    <li>User mở app, chọn nhập triệu chứng.</li>
+    <li>Input: <strong>"Tôi bị sốt và đau họng"</strong>.</li>
+    <li>App bắt đầu hỏi từng câu một rồi đưa ra kết quả.</li>
+  </ul>
+
+  <h3>4.2 Điều quan sát được</h3>
+  <ul>
+    <li>App hỏi nhiều câu bắt đầu bằng "Bạn có..." ngay cả khi triệu chứng rõ ràng.</li>
+    <li>Một số câu hỏi lặp lại cảm giác chung chung, khiến user mất kiên nhẫn.</li>
+    <li>Kết quả trả về danh sách nhiều khả năng (Flu, COVID-19, cảm lạnh) mà không xếp thứ tự ưu tiên.</li>
+    <li>App không kết luận rõ hành động tiếp theo, chỉ nói "hãy gặp bác sĩ nếu tình trạng nghiêm trọng".</li>
+  </ul>
+
+  <h3>4.3 Vấn đề chính</h3>
+  <ul>
+    <li>Flow kéo dài và không hiệu quả với user cần câu trả lời nhanh.</li>
+    <li>User bị chuyển từ mục tiêu "muốn biết nên làm gì" sang "phải đọc nhiều khả năng bệnh".</li>
+    <li>Thiếu triage: không phân biệt rõ ràng khi cần test ngay, nghỉ ngơi tại nhà hay đi khám.</li>
+  </ul>
+
+  <h2>5. Evidence</h2>
+  <ul>
+    <li>Screenshot: màn kết quả Ada Health sau 7 câu hỏi.</li>
+    <li>Prompt / input ban đầu: "Tôi bị sốt và đau họng".</li>
+    <li>Hành vi quan sát: app vẫn nhận đúng triệu chứng nhưng chưa cho hành động cụ thể.</li>
+    <li>Ghi chú thêm: app trả thông tin nguy cơ COVID-19 nhưng không hướng dẫn rõ test hay cách theo dõi triệu chứng.</li>
+  </ul>
+
+  <h2>6. 4 paths</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Path</th>
+        <th>Nội dung</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Happy</td>
+        <td>AI xác định đúng triệu chứng chính và trả về 1 hành động ưu tiên: nghỉ ngơi / test COVID / khám ngay.</td>
+      </tr>
+      <tr>
+        <td>Low-confidence</td>
+        <td>AI chưa chắc, hỏi thêm 1-2 câu trọng tâm: thời gian sốt, khó thở, mệt mỏi nặng.</td>
+      </tr>
+      <tr>
+        <td>Failure</td>
+        <td>AI trả nhiều khả năng bệnh và không chỉ ra hành động cụ thể, user bối rối không biết làm gì.</td>
+      </tr>
+      <tr>
+        <td>Correction</td>
+        <td>User sửa triệu chứng hoặc chọn "tôi không chắc", app giữ context và hỏi lại theo hướng rõ ràng.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>7. Finding thành quyết định</h2>
+  <div class="note">
+    <p><strong>Finding:</strong> Khi user nhập "Tôi bị sốt và đau họng", app hỏi nhiều câu phụ và trả về danh sách bệnh khả dĩ, dẫn đến user dễ lo lắng và không biết bước tiếp theo.</p>
+    <p><strong>Decision:</strong> Chuyển trọng tâm từ "dự đoán bệnh" sang "triage hành động".</p>
+  </div>
+  <ul>
+    <li>Nếu AI đủ tự tin: cho 1 hành động chính cùng lý do.</li>
+    <li>Nếu AI không đủ tự tin: hỏi thêm 1-2 câu trọng tâm, không hỏi lan man.</li>
+    <li>Nếu user sửa input: giữ logic, không reset toàn bộ flow.</li>
+  </ul>
+
+  <h2>8. Sketch as-is / to-be</h2>
+  <h3>As-is</h3>
+  <p>User nhập triệu chứng → App hỏi nhiều câu sâu/future → Kết quả show nhiều bệnh → User hoang mang.</p>
+
+  <h3>To-be</h3>
+  <p>User nhập triệu chứng → App xác nhận yếu tố quan trọng nhanh → Kết quả show 1 hành động chính + lý do + cảnh báo rõ ràng nếu cần test hoặc khám.</p>
+
+  <h2>9. Điều này đổi gì trong SPEC?</h2>
+  <ul>
+    <li>Thêm requirement: "Ngay khi xác định triệu chứng chính, app phải trả hành động ưu tiên thay vì chỉ liệt kê khả năng".</li>
+    <li>Thêm path rõ ràng cho low-confidence: "nếu không đủ dữ liệu, app chỉ hỏi tối đa 2 câu quan trọng".</li>
+    <li>Thêm failure mode: "app không được đưa ra nhiều khả năng bệnh cùng lúc nếu user chưa rõ mục tiêu".</li>
+    <li>Huyền thực hiện kiểm thử phần này để xác nhận trải nghiệm triage rõ ràng.</li>
+  </ul>
+
+  <h2>10. Next steps for Huyền</h2>
+  <ul>
+    <li>Hoàn thiện screenshot và note chi tiết từng câu hỏi của app.</li>
+    <li>Ghi lại thời lượng mỗi bước để chứng minh flow có thể rút ngắn.</li>
+    <li>Chia sẻ phát hiện với team để cập nhật evidence pack và thin spec.</li>
+  </ul>
+</body>
+</html>
